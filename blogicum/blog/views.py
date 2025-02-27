@@ -189,7 +189,7 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
 
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     """Редактирование поста"""
-    
+
     model = Post
     form_class = PostForm
     template_name = 'blog/create.html'
