@@ -88,6 +88,7 @@ def post_detail(request, post_id):
 
 class CategoryPostsView(ListView):
     """Отображение постов в категории"""
+
     model = Post
     template_name = 'blog/category.html'
     context_object_name = 'posts'
@@ -123,6 +124,7 @@ class CategoryPostsView(ListView):
 
 class PostCreateView(LoginRequiredMixin, CreateView):
     """Создание поста"""
+
     model = Post
     form_class = PostForm
     template_name = 'blog/create.html'
@@ -163,6 +165,7 @@ def profile(request, username):
 
 class CommentCreateView(LoginRequiredMixin, CreateView):
     """Создание комментария"""
+
     model = Comment
     form_class = CommentForm
     template_name = 'blog/comment.html'
@@ -186,6 +189,7 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
 
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     """Редактирование поста"""
+    
     model = Post
     form_class = PostForm
     template_name = 'blog/create.html'
