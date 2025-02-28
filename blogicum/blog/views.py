@@ -1,20 +1,18 @@
-from django.shortcuts import render, get_object_or_404, redirect
-from django.utils import timezone
-from django.core.paginator import Paginator
-from django.core.exceptions import PermissionDenied
-from django.urls import reverse_lazy, reverse
-
-from django.views.generic import CreateView, UpdateView, ListView
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.core.exceptions import PermissionDenied
+from django.core.paginator import Paginator
 from django.db.models import Count
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse, reverse_lazy
+from django.utils import timezone
+from django.views.generic import CreateView, ListView, UpdateView
 
-from blog.models import Post, Category, Comment
-from blog.forms import PostForm, CommentForm, ProfileForm
+from blog.forms import CommentForm, PostForm, ProfileForm
+from blog.models import Category, Comment, Post
 from blogicum.constants import TOTAL_POST
 from blogicum.service import get_published_posts, paginate_page
-
 
 User = get_user_model()
 

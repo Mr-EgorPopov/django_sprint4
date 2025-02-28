@@ -1,7 +1,7 @@
-from django.db import models
-from django.urls import reverse
 from django.contrib import admin
 from django.contrib.auth import get_user_model
+from django.db import models
+from django.urls import reverse
 
 from blogicum.constants import MAX_LENGTH, TEXT_LENGTH
 

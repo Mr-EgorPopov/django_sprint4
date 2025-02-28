@@ -1,7 +1,6 @@
-from django.urls import path, reverse_lazy, include
+from django.urls import include, path, reverse_lazy
 
 from blog import views
-
 
 app_name = 'blog'
 
