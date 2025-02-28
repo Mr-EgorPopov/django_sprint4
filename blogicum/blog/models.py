@@ -8,7 +8,7 @@ from blogicum.constants import MAX_LENGTH, TEXT_LENGTH
 User = get_user_model()
 
 
-class Is_pubModel(models.Model):
+class IsPubModel(models.Model):
     is_published = models.BooleanField(
         verbose_name='Опубликовано',
         default=True,
@@ -23,7 +23,7 @@ class Is_pubModel(models.Model):
         abstract = True
 
 
-class Category(Is_pubModel):
+class Category(IsPubModel):
     title = models.CharField(
         max_length=TEXT_LENGTH,
         verbose_name='Заголовок',
@@ -48,7 +48,7 @@ class Category(Is_pubModel):
         return self.title
 
 
-class Location(Is_pubModel):
+class Location(IsPubModel):
     name = models.CharField(
         max_length=TEXT_LENGTH,
         verbose_name='Название места',
@@ -62,7 +62,7 @@ class Location(Is_pubModel):
         return self.name
 
 
-class Post(Is_pubModel):
+class Post(IsPubModel):
     title = models.CharField(
         max_length=MAX_LENGTH,
         verbose_name='Заголовок',
