@@ -27,5 +27,5 @@ if settings.DEBUG:
         document_root=settings.MEDIA_ROOT
     )
 
-handler404 = 'core.views.page_not_found'
-handler500 = 'core.views.forbidden'
+handler404 = 'pages.views.page_not_found'
+handler500 = 'pages.views.forbidden'
