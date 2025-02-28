@@ -1,12 +1,14 @@
 from django.db import models
+from django.urls import reverse
+from django.contrib import admin
 from django.contrib.auth import get_user_model
 
-from blogicum.constants import MAX_LENGTH
+from blogicum.constants import MAX_LENGTH, TEXT_LENGTH
 
 User = get_user_model()
 
 
-class BaseModel(models.Model):
+class Is_pubModel(models.Model):
     is_published = models.BooleanField(
         verbose_name='Опубликовано',
         default=True,
@@ -21,9 +23,9 @@ class BaseModel(models.Model):
         abstract = True
 
 
-class Category(BaseModel):
+class Category(Is_pubModel):
     title = models.CharField(
-        max_length=MAX_LENGTH,
+        max_length=TEXT_LENGTH,
         verbose_name='Заголовок',
     )
     description = models.TextField(
@@ -32,8 +34,10 @@ class Category(BaseModel):
     slug = models.SlugField(
         verbose_name='Идентификатор',
         unique=True,
-        help_text='Идентификатор страницы для URL; '
-        'разрешены символы латиницы, цифры, дефис и подчёркивание.'
+        help_text=(
+            'Идентификатор страницы для URL; '
+            'разрешены символы латиницы, цифры, дефис и подчёркивание.'
+        )
     )
 
     class Meta:
@@ -44,9 +48,9 @@ class Category(BaseModel):
         return self.title
 
 
-class Location(BaseModel):
+class Location(Is_pubModel):
     name = models.CharField(
-        max_length=MAX_LENGTH,
+        max_length=TEXT_LENGTH,
         verbose_name='Название места',
     )
 
@@ -58,7 +62,7 @@ class Location(BaseModel):
         return self.name
 
 
-class Post(BaseModel):
+class Post(Is_pubModel):
     title = models.CharField(
         max_length=MAX_LENGTH,
         verbose_name='Заголовок',
@@ -68,37 +72,41 @@ class Post(BaseModel):
     )
     pub_date = models.DateTimeField(
         verbose_name='Дата и время публикации',
-        help_text='Если установить дату и время в будущем '
-        '— можно делать отложенные публикации.'
+        help_text=(
+            'Если установить дату и время в будущем '
+            '— можно делать отложенные публикации.'
+        )
     )
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='posts',
         verbose_name='Автор публикации',
     )
     location = models.ForeignKey(
         Location,
         on_delete=models.SET_NULL,
         null=True,
-        related_name='posts',
+        blank=True,
         verbose_name='Местоположение',
     )
     category = models.ForeignKey(
         Category,
         on_delete=models.SET_NULL,
         null=True,
-        related_name='posts',
         verbose_name='Категория',
     )
     image = models.ImageField('Фото', upload_to='media/', blank=True)
 
     class Meta:
+        default_related_name = 'posts'
         verbose_name = 'публикация'
         verbose_name_plural = 'Публикации'
 
     def __str__(self):
         return self.title
+
+    def get_absolute_url(self):
+        return reverse('blog:post_detail', kwargs={'pk': self.pk})
 
 
 class Comment(models.Model):
@@ -122,4 +130,12 @@ class Comment(models.Model):
         verbose_name_plural = 'Комментарии'
 
     def __str__(self):
-        return self.text
+        return (f'Комментарий от {self.author}: '
+                f'"{self.text}" к посту "{self.post.title}"')
+
+
+class PostAdmin(admin.ModelAdmin):
+    list_display = ('title', 'author', 'created_at')
+    list_filter = ('author', 'created_at')
+    search_fields = ('title', 'content')
+    ordering = ('-created_at',)

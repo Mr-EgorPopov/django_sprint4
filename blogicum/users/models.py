@@ -1,7 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 
 
-class MyUser(AbstractUser):
+class Subscriber(AbstractUser):
     pass
 
     def __str__(self):

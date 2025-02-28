@@ -7,6 +7,6 @@ from .models import MyUser
 user = get_user_model()
 
 
-class CustomUserCreationForm(UserCreationForm):
+class ConsumerCreationForm(UserCreationForm):
     class Meta(UserCreationForm.Meta):
         model = MyUser
