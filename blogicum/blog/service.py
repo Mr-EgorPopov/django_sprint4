@@ -1,6 +1,6 @@
 from django.core.paginator import Paginator
-from django.utils import timezone
 from django.db.models import Count
+from django.utils import timezone
 
 from blog.models import Post
 from blogicum.constants import TOTAL_POST

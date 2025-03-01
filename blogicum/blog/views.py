@@ -9,8 +9,8 @@ from django.views.generic import CreateView, ListView, UpdateView
 
 from blog.forms import CommentForm, PostForm, ProfileForm
 from blog.models import Category, Comment, Post
-from blogicum.constants import TOTAL_POST
 from blog.service import get_published_posts, paginate_page
+from blogicum.constants import TOTAL_POST
 
 User = get_user_model()
 
