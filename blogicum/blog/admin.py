@@ -6,7 +6,7 @@ from blog.models import Category, Comment, Location, Post
 class PostAdmin(admin.ModelAdmin):
     list_display = ('title', 'author', 'created_at')
     list_filter = ('author', 'created_at')
-    search_fields = ('title')
+    search_fields = ('title', 'author')
 
 
 admin.site.register(Post, PostAdmin)
