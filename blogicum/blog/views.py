@@ -10,18 +10,16 @@ from django.views.generic import CreateView, ListView, UpdateView
 from blog.forms import CommentForm, PostForm, ProfileForm
 from blog.models import Category, Comment, Post
 from blogicum.constants import TOTAL_POST
-from blogicum.service import get_published_posts, paginate_page
+from blog.service import get_published_posts, paginate_page
 
 User = get_user_model()
 
 
 def index(request):
     """Отображение постов на главной странице."""
-    template = 'blog/index.html'
-    posts = get_published_posts().annotate(
-        comment_count=Count('comments')).order_by('-pub_date')
+    posts = get_published_posts(comment_count=True)
     context = {'page_obj': paginate_page(request, posts)}
-    return render(request, template, context)
+    return render(request, 'blog/index.html', context)
 
 
 def post_detail(request, post_id):
@@ -63,17 +61,9 @@ class CategoryPostsView(ListView):
             slug=category_slug,
             is_published=True
         )
-        current_time = timezone.now()
-        return Post.objects.select_related(
-            'category',
-            'author',
-            'location'
-        ).filter(
-            pub_date__lte=current_time,
-            is_published=True,
+        return get_published_posts(three_category=True).filter(
             category=category,
-            category__is_published=True,
-        ).annotate(comment_count=Count('comments')).order_by('-pub_date')
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -108,29 +98,20 @@ def profile(request, username):
     """Профиль пользователя."""
     user = get_object_or_404(User, username=username)
     if request.user == user:
-        posts = Post.objects.select_related(
-            'category', 'author', 'location',
-        ).annotate(comment_count=Count(
-            'comments'
-        )).order_by('-pub_date').filter(
+        posts = get_published_posts(profile=True).filter(
             author=user.id
         )
     else:
-        posts = Post.objects.select_related(
-            'category', 'author', 'location',
-        ).annotate(comment_count=Count(
-            'comments'
-        )).order_by('-pub_date').filter(
+        posts = get_published_posts(profile=True).filter(
             author=user,
             is_published=True,
             pub_date__lte=timezone.now()
         )
-    template = 'blog/profile.html'
     context = {
         'profile': user,
         'page_obj': paginate_page(request, posts),
     }
-    return render(request, template, context)
+    return render(request, 'blog/profile.html', context)
 
 
 class CommentCreateView(LoginRequiredMixin, CreateView):
@@ -182,7 +163,6 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 @login_required
 def delete_post(request, post_id):
     """Удаление поста."""
-    template_name = 'blog/create.html'
     post = get_object_or_404(
         Post, pk=post_id, author__username=request.user
     )
@@ -192,7 +172,7 @@ def delete_post(request, post_id):
     context = {
         'post': post,
     }
-    return render(request, template_name, context)
+    return render(request, 'blog/create.html', context)
 
 
 @login_required
@@ -206,13 +186,12 @@ def edit_comment(request, post_id, comment_id):
     if form.is_valid():
         form.save()
         return redirect('blog:post_detail', post_id)
-    template = 'blog/comment.html'
     context = {
         'form': form,
         'post': post,
         'comment': comment,
     }
-    return render(request, template, context)
+    return render(request, 'blog/comment.html', context)
 
 
 @login_required
@@ -225,18 +204,16 @@ def delete_comment(request, post_id, comment_id):
     if request.method == "POST":
         comment.delete()
         return redirect('blog:post_detail', post_id=post_id)
-    template = 'blog/comment.html'
     context = {
         'post': post,
         'comment': comment,
     }
-    return render(request, template, context)
+    return render(request, 'blog/comment.html', context)
 
 
 @login_required
 def edit_profile(request):
     """Редактирование профиля."""
-    template = 'blog/user.html'
     instance = request.user
     form = ProfileForm(request.POST or None, instance=request.user)
     if form.is_valid():
@@ -246,4 +223,4 @@ def edit_profile(request):
             username=instance.username
         )
     context = {'form': form}
-    return render(request, template, context)
+    return render(request, 'blog/user.html', context)

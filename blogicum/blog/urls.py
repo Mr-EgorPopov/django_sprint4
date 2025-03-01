@@ -8,7 +8,6 @@ posts_urls = [
     path(
         '<int:post_id>/comment/',
         views.CommentCreateView.as_view(),
-        # views.add_comment,
         name='add_comment'
     ),
     path(
@@ -27,11 +26,6 @@ posts_urls = [
         '<int:post_id>/delete/',
         views.delete_post,
         name='delete_post'
-    ),
-    path(
-        '<int:post_id>/edit_comment/<int:comment_id>/',
-        views.edit_comment,
-        name='edit_comment'
     ),
     path(
         '<int:post_id>/edit_comment/<int:comment_id>/',

@@ -132,10 +132,3 @@ class Comment(models.Model):
     def __str__(self):
         return (f'Комментарий от {self.author}: '
                 f'"{self.text}" к посту "{self.post.title}"')
-
-
-class PostAdmin(admin.ModelAdmin):
-    list_display = ('title', 'author', 'created_at')
-    list_filter = ('author', 'created_at')
-    search_fields = ('title', 'content')
-    ordering = ('-created_at',)
