@@ -30,14 +30,12 @@ def post_detail(request, post_id):
                 author=request.user
             ) | get_published_posts(
                 comment_count=False,
-                on_filter=False
             ).filter(pk=post_id)
         )
     else:
         post = get_object_or_404(
             get_published_posts(
                 comment_count=False,
-                on_filter=False
             ),
             pk=post_id
         )
@@ -102,20 +100,9 @@ class PostCreateView(LoginRequiredMixin, CreateView):
 def profile(request, username):
     """Профиль пользователя."""
     user = get_object_or_404(User, username=username)
-    if request.user == user:
-        posts = get_published_posts(
-            on_filter=False
-        ).filter(
-            author=user.id
-        )
-    else:
-        posts = get_published_posts(
-            on_filter=False
-        ).filter(
-            author=user,
-            is_published=True,
-            pub_date__lte=timezone.now()
-        )
+    posts = get_published_posts(
+        on_filter=request.user != user
+    ).filter(author=user)
     context = {
         'profile': user,
         'page_obj': paginate_page(request, posts),

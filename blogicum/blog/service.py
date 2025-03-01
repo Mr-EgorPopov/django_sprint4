@@ -16,22 +16,16 @@ def get_published_posts(
         'author',
         'location',
     )
-    queryset = Post.objects.filter(
-        is_published=True,
-        category__is_published=True,
-        pub_date__lte=timezone.now()
-    )
-    if comment_count and not on_filter:
-        queryset = queryset_flash.annotate(
+    if comment_count:
+        queryset_flash = queryset_flash.annotate(
             comment_count=Count('comments')).order_by('-pub_date')
-    elif comment_count:
-        queryset = queryset_flash.filter(
+    if on_filter:
+        queryset_flash = queryset_flash.filter(
             is_published=True,
             category__is_published=True,
             pub_date__lte=timezone.now()
-        ).annotate(
-            comment_count=Count('comments')).order_by('-pub_date')
-    return queryset
+        )
+    return queryset_flash
 
 
 def paginate_page(request, posts, total=TOTAL_POST):
