@@ -16,7 +16,7 @@ User = get_user_model()
 
 def index(request):
     """Отображение постов на главной странице."""
-    posts = get_published_posts(comment_count=True)
+    posts = get_published_posts()
     context = {'page_obj': paginate_page(request, posts)}
     return render(request, 'blog/index.html', context)
 
@@ -28,11 +28,17 @@ def post_detail(request, post_id):
             Post.objects.filter(
                 pk=post_id,
                 author=request.user
-            ) | get_published_posts().filter(pk=post_id)
+            ) | get_published_posts(
+                comment_count=False,
+                on_filter=False
+            ).filter(pk=post_id)
         )
     else:
         post = get_object_or_404(
-            get_published_posts(),
+            get_published_posts(
+                comment_count=False,
+                on_filter=False
+            ),
             pk=post_id
         )
     form = CommentForm()
@@ -60,7 +66,7 @@ class CategoryPostsView(ListView):
             slug=category_slug,
             is_published=True
         )
-        return get_published_posts(three_category=True).filter(
+        return get_published_posts().filter(
             category=category,
         )
 
@@ -97,11 +103,15 @@ def profile(request, username):
     """Профиль пользователя."""
     user = get_object_or_404(User, username=username)
     if request.user == user:
-        posts = get_published_posts(profile=True).filter(
+        posts = get_published_posts(
+            on_filter=False
+        ).filter(
             author=user.id
         )
     else:
-        posts = get_published_posts(profile=True).filter(
+        posts = get_published_posts(
+            on_filter=False
+        ).filter(
             author=user,
             is_published=True,
             pub_date__lte=timezone.now()

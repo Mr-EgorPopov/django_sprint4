@@ -7,10 +7,8 @@ from blogicum.constants import TOTAL_POST
 
 
 def get_published_posts(
-        author=False,
-        comment_count=False,
-        three_category=False,
-        profile=False,
+        comment_count=True,
+        on_filter=True
 ):
     """Получение опубликованных постов."""
     queryset_flash = Post.objects.select_related(
@@ -23,21 +21,16 @@ def get_published_posts(
         category__is_published=True,
         pub_date__lte=timezone.now()
     )
-    if author:
-        queryset = queryset.select_related('author')
-    elif comment_count:
-        queryset = queryset.select_related('author').annotate(
+    if comment_count and not on_filter:
+        queryset = queryset_flash.annotate(
             comment_count=Count('comments')).order_by('-pub_date')
-    elif three_category:
-        queryset = queryset.select_related(
-            'category',
-            'author',
-            'location'
-        ).annotate(comment_count=Count('comments')).order_by('-pub_date')
-    elif profile:
-        queryset = queryset_flash.annotate(comment_count=Count(
-            'comments'
-        )).order_by('-pub_date')
+    elif comment_count:
+        queryset = queryset_flash.filter(
+            is_published=True,
+            category__is_published=True,
+            pub_date__lte=timezone.now()
+        ).annotate(
+            comment_count=Count('comments')).order_by('-pub_date')
     return queryset
 
 
